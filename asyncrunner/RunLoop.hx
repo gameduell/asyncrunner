@@ -120,7 +120,7 @@ class RunLoop
 
         /// execute 1 low prio function, and as much as possible for the time limit
 
-        var lowPrioFunctionCount = queuedASAPFunctions.size();
+        var lowPrioFunctionCount = queuedFunctions.size();
 
         if(lowPrioFunctionCount == 0)
             return;
@@ -169,7 +169,7 @@ class RunLoop
 
     private function doOneLowPriorityFunction()
     {
-        var func = queuedFunctions.dequeue();
+        var func : Dynamic = queuedFunctions.dequeue();
 
         var paramCount = queuedParamCount.dequeue();
 
@@ -191,7 +191,7 @@ class RunLoop
 
     private function doOneASAPPriorityFunction()
     {
-        var func = queuedASAPFunctions.dequeue();
+        var func : Dynamic = queuedASAPFunctions.dequeue();
 
         var paramCount = queuedASAPParamCount.dequeue();
 

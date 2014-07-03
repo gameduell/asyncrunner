@@ -6,7 +6,7 @@
  */
 package asyncrunner;
 
-import asyncrunner.TaskGroup;
+import asyncrunner.Task;
 
 class SequentialTaskGroup extends Task
 {

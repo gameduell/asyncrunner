@@ -20,7 +20,7 @@ class Task
     ///should be overridden by subclasses
     public function execute() : Void
     {
-        onFinish.dispatch(self);
+        onFinish.dispatch(this);
     }
 
     /// is called when the task completes its execution

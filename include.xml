@@ -2,5 +2,6 @@
 <extension>
 
     <haxelib name="polygonal-ds" />
+    <haxelib name="polygonal-printf" />
 
 </extension>

@@ -5,5 +5,10 @@
     "description" : "An API for asynchronous task execution.",
     "releasenote" : "",
     "contributors" : [ "GameDuell GmbH" ],
-    "dependencies" : {}
+    "dependencies" :
+    {
+
+        "polygonal-ds":""
+
+    }
 }
