@@ -12,7 +12,7 @@ class MainRunLoop extends RunLoop
 {
     public function new() : Void
     {
-        Platform.instance().onUpdate.addWithPriority(onUpdate, 2147483647);
+        Platform.instance().onUpdate.addWithPriority(onUpdate, 2147483647); /// MAX INT
 
         super();
 

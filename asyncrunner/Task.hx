@@ -34,4 +34,7 @@ class Task
 
     public var runLoopForExecution : RunLoop;
     public var runLoopForFinishing : RunLoop;
+
+    ///arbitrarily place things here that are meant to represent the result of the task
+    public var data : Dynamic;
 }

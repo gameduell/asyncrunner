@@ -11,8 +11,11 @@ import cpp.vm.Thread;
 class PooledRunLoop extends RunLoop
 {
     private var wantsToTerminate = false;
-
+    #if ios
     static private var maxPoolCount = 4;
+    #else
+    static private var maxPoolCount = 0;
+    #end
 
     private var runLoopList : Array<ThreadRunLoop>;
     public function new()
