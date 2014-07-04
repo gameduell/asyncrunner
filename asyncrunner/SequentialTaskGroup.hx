@@ -26,7 +26,7 @@ class SequentialTaskGroup extends Task
 
         if(currentTaskIndex >= taskQueue.length)
         {
-            RunLoop.getCurrentLoop().queue1(onFinish.dispatch, this, priority);
+            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
         }
         else
         {
@@ -39,7 +39,7 @@ class SequentialTaskGroup extends Task
         var currentTask = taskQueue[currentTaskIndex];
 
         currentTask.onFinish.addOnce(taskFinished);
-        RunLoop.getCurrentLoop().queue(currentTask.execute, priority);
+        runLoopForExecution.queue(currentTask.execute, priorityForExecution);
     }
 
     override function execute() : Void
@@ -48,7 +48,7 @@ class SequentialTaskGroup extends Task
 
         if(taskQueue.length == 0)
         {
-            RunLoop.getCurrentLoop().queue1(onFinish.dispatch, this, priority);
+            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
         }
         else
         {

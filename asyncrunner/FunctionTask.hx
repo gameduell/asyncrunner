@@ -19,11 +19,11 @@ class FunctionTask extends Task
     private function executeFuncAndExit()
     {
         func();
-        onFinish.dispatch(this);
+        runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
     }
 
     override function execute() : Void
     {
-        RunLoop.getCurrentLoop().queue1(executeFuncAndExit, this, priority);
+        runLoopForExecution.queue1(executeFuncAndExit, this, priorityForExecution);
     }
 }

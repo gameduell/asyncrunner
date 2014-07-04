@@ -14,16 +14,24 @@ class Task
     private function new()
     {
         onFinish = new Signal1<Task>();
-        priority = PriorityLow;
+        priorityForExecution = PriorityLow;
+        priorityForFinishing = PriorityLow;
+        runLoopForExecution = RunLoop.getMainLoop();
+        runLoopForFinishing = RunLoop.getMainLoop();
     }
 
     ///should be overridden by subclasses
     public function execute() : Void
     {
-        onFinish.dispatch(this);
+        runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
     }
 
     /// is called when the task completes its execution
     public var onFinish : Signal1<Task>;
-    public var priority : Priority;
+
+    public var priorityForExecution : Priority;
+    public var priorityForFinishing : Priority;
+
+    public var runLoopForExecution : RunLoop;
+    public var runLoopForFinishing : RunLoop;
 }

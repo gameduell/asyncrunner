@@ -11,20 +11,16 @@ import de.polygonal.ds.LinkedQueue;
 import haxe.Timer;
 
 #if cpp
-import cpp.vm.Thread;
+import cpp.vm.Mutex;
 #end
 
 class RunLoop
 {
+    static private var mainLoop : RunLoop;
+    static private var pooledRunLoop : RunLoop;
 
     #if cpp
-
-    static private var runLoopInstancesPerThread : Map<Dynamic, RunLoop >;
-
-    #else
-
-    static private var singleRunLoopInstance : RunLoop;
-
+    private var queueMutex : Mutex;
     #end
 
     private var queuedFunctions : LinkedQueue<Dynamic>;
@@ -35,64 +31,22 @@ class RunLoop
     private var queuedASAPParams : LinkedQueue< Dynamic >;
     private var queuedASAPParamCount : LinkedQueue<Int>;
 
-    #if cpp
-
-    static public function getLoopForThread(thread : Thread) : RunLoop
+    static public function getMainLoop() : RunLoop
     {
-        if(runLoopInstancesPerThread == null ||
-           !runLoopInstancesPerThread.exists(thread.handle))
-        {
-            return null;
-        }
-        else
-        {
-            return runLoopInstancesPerThread[thread.handle];
-        }
+        if(mainLoop == null)
+            initializeBaseRunLoops();
+        return mainLoop;
     }
 
-    #end
-
-    static public function getCurrentLoop() : RunLoop
+    static public function getPooledLoop() : RunLoop
     {
-
-        #if cpp
-
-        return getLoopForThread(Thread.current());
-
-        #else
-
-        return singleRunLoopInstance;
-
-        #end
+        if(pooledRunLoop == null)
+            initializeBaseRunLoops();
+        return pooledRunLoop;
     }
-
 
     public function new()
     {
-        #if cpp
-
-        if(runLoopInstancesPerThread == null)
-             runLoopInstancesPerThread = new Map<Dynamic, RunLoop >();
-
-        if(!runLoopInstancesPerThread.exists(Thread.current().handle))
-        {
-            runLoopInstancesPerThread.set(Thread.current().handle, this);
-        }
-        else
-        {
-            throw "Only one RunLoop is allowed per thread. Use RunLoop.getCurrentLoop() to get the current one.";
-        }
-
-        #else
-
-        if(singleRunLoopInstance != null)
-        {
-            throw "Only one RunLoop is allowed. Use RunLoop.getCurrentLoop() to get the current one.";
-        }
-        singleRunLoopInstance = this;
-
-        #end
-
         queuedFunctions = new LinkedQueue();
         queuedParams = new LinkedQueue();
         queuedParamCount = new LinkedQueue();
@@ -100,15 +54,67 @@ class RunLoop
         queuedASAPFunctions = new LinkedQueue();
         queuedASAPParams = new LinkedQueue();
         queuedASAPParamCount = new LinkedQueue();
+
+        #if cpp
+        queueMutex = new Mutex();
+        #end
+    }
+
+    static private function initializeBaseRunLoops()
+    {
+        if(mainLoop != null)
+        {
+            throw "Only one main RunLoop is allowed. Use RunLoop.getMainLoop() to get the main one.";
+        }
+
+        mainLoop = new MainRunLoop();
+
+        pooledRunLoop = new PooledRunLoop();
+
+    }
+
+    public function loopAll()
+    {
+        while(true)
+        {
+            var executedSomething = false;
+
+            var asapFunctionCount = queuedASAPFunctions.size();
+
+            while(asapFunctionCount > 0)
+            {
+                doOneASAPPriorityFunction();
+                --asapFunctionCount;
+
+                executedSomething = true;
+            }
+
+            var lowPrioFunctionCount = queuedFunctions.size();
+
+            while(lowPrioFunctionCount > 0)
+            {
+                doOneLowPriorityFunction();
+
+                --lowPrioFunctionCount;
+
+                executedSomething = true;
+            }
+
+            if(!executedSomething)
+                break;
+        }
     }
 
     public function loopOnce(timeLimit : Float)
     {
+        var executedCount = 0;
         var initialTime : Float = Timer.stamp ();
 
         var timeLeft = timeLimit;
 
+
         var asapFunctionCount = queuedASAPFunctions.size();
+        var lowPrioFunctionCount = queuedFunctions.size();
 
         /// execute all asap functions
 
@@ -116,21 +122,22 @@ class RunLoop
         {
             doOneASAPPriorityFunction();
             --asapFunctionCount;
+            executedCount++;
         }
 
         /// execute 1 low prio function, and as much as possible for the time limit
 
-        var lowPrioFunctionCount = queuedFunctions.size();
 
         if(lowPrioFunctionCount == 0)
+        {
             return;
+        }
 
         doOneLowPriorityFunction();
         --lowPrioFunctionCount;
 
         var timeAfterASAPAndOneLowPrio = Timer.stamp();
         timeLeft -= timeAfterASAPAndOneLowPrio - initialTime;
-
         /// execute remaining low prios for as much as the time limit allows
 
         var timeBeforeOneLowPrio = Timer.stamp();
@@ -143,76 +150,134 @@ class RunLoop
             timeBeforeOneLowPrio = newTime;
 
             --lowPrioFunctionCount;
+            executedCount++;
         }
     }
 
-    /// run loop instance will be garbage collected after this, if it's not held somewhere
+    /// main run loop instance will be garbage collected after this, if it's not held somewhere
     public function terminate()
     {
-        #if cpp
+        if(mainLoop == this)
+            mainLoop = null;
 
-        for(key in runLoopInstancesPerThread.keys())
-        {
-            if(runLoopInstancesPerThread[key] == this)
-            {
-                runLoopInstancesPerThread.remove(key);
-                break;
-            }
-        }
+        queuedFunctions = null;
+        queuedParams = null;
+        queuedParamCount = null;
 
-        #else
-
-        singleRunLoopInstance = null;
-
-        #end
+        queuedASAPFunctions = null;
+        queuedASAPParams = null;
+        queuedASAPParamCount = null;
     }
 
     private function doOneLowPriorityFunction()
     {
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         var func : Dynamic = queuedFunctions.dequeue();
 
         var paramCount = queuedParamCount.dequeue();
+
+        var param1 = null, param2 = null, param3 = null, param4 = null;
+
+        switch(paramCount)
+        {
+            case (0):
+            case (1):
+                param1 = queuedParams.dequeue();
+            case (2):
+                param1 = queuedParams.dequeue();
+                param2 = queuedParams.dequeue();
+            case (3):
+                param1 = queuedParams.dequeue();
+                param2 = queuedParams.dequeue();
+                param3 = queuedParams.dequeue();
+            case (4):
+                param1 = queuedParams.dequeue();
+                param2 = queuedParams.dequeue();
+                param3 = queuedParams.dequeue();
+                param4 = queuedParams.dequeue();
+        }
+
+        #if cpp
+        queueMutex.release();
+        #end
 
         switch(paramCount)
         {
             case (0):
                 func();
             case (1):
-                func(queuedParams.dequeue());
+                func(param1);
             case (2):
-                func(queuedParams.dequeue(), queuedParams.dequeue());
+                func(param1, param2);
             case (3):
-                func(queuedParams.dequeue(), queuedParams.dequeue(), queuedParams.dequeue());
+                func(param1, param2, param3);
             case (4):
-                func(queuedParams.dequeue(), queuedParams.dequeue(), queuedParams.dequeue(), queuedParams.dequeue());
+                func(param1, param2, param3, param4);
 
         }
     }
 
     private function doOneASAPPriorityFunction()
     {
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         var func : Dynamic = queuedASAPFunctions.dequeue();
 
         var paramCount = queuedASAPParamCount.dequeue();
+
+        var param1 = null, param2 = null, param3 = null, param4 = null;
+
+        switch(paramCount)
+        {
+            case (0):
+            case (1):
+                param1 = queuedASAPParams.dequeue();
+            case (2):
+                param1 = queuedASAPParams.dequeue();
+                param2 = queuedASAPParams.dequeue();
+            case (3):
+                param1 = queuedASAPParams.dequeue();
+                param2 = queuedASAPParams.dequeue();
+                param3 = queuedASAPParams.dequeue();
+            case (4):
+                param1 = queuedASAPParams.dequeue();
+                param2 = queuedASAPParams.dequeue();
+                param3 = queuedASAPParams.dequeue();
+                param4 = queuedASAPParams.dequeue();
+        }
+
+        #if cpp
+        queueMutex.release();
+        #end
 
         switch(paramCount)
         {
             case (0):
                 func();
             case (1):
-                func(queuedASAPParams.dequeue());
+                func(param1);
             case (2):
-                func(queuedASAPParams.dequeue(), queuedASAPParams.dequeue());
+                func(param1, param2);
             case (3):
-                func(queuedASAPParams.dequeue(), queuedASAPParams.dequeue(), queuedASAPParams.dequeue());
+                func(param1, param2, param3);
             case (4):
-                func(queuedASAPParams.dequeue(), queuedASAPParams.dequeue(), queuedASAPParams.dequeue(), queuedASAPParams.dequeue());
+                func(param1, param2, param3, param4);
 
         }
     }
 
     public function queue(func : Dynamic, priority : Priority) : Void
     {
+
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         switch(priority)
         {
             case(PriorityASAP):
@@ -222,10 +287,18 @@ class RunLoop
                 queuedFunctions.enqueue(func);
                 queuedParamCount.enqueue(0);
         }
+
+        #if cpp
+        queueMutex.release();
+        #end
     }
 
     public function queue1(func : Dynamic, param : Dynamic, priority : Priority) : Void
     {
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         switch(priority)
         {
             case(PriorityASAP):
@@ -237,10 +310,18 @@ class RunLoop
                 queuedParamCount.enqueue(1);
                 queuedParams.enqueue(param);
         }
+
+        #if cpp
+        queueMutex.release();
+        #end
     }
 
     public function queue2(func : Dynamic, param1 : Dynamic, param2 : Dynamic, priority : Priority) : Void
     {
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         switch(priority)
         {
             case(PriorityASAP):
@@ -254,10 +335,18 @@ class RunLoop
                 queuedParams.enqueue(param1);
                 queuedParams.enqueue(param2);
         }
+
+        #if cpp
+        queueMutex.release();
+        #end
     }
 
     public function queue3(func : Dynamic, param1 : Dynamic, param2 : Dynamic, param3 : Dynamic, priority : Priority) : Void
     {
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         switch(priority)
         {
             case(PriorityASAP):
@@ -273,11 +362,19 @@ class RunLoop
                 queuedParams.enqueue(param2);
                 queuedParams.enqueue(param3);
         }
+
+        #if cpp
+        queueMutex.release();
+        #end
     }
 
 
     public function queue4(func : Dynamic, param1 : Dynamic, param2 : Dynamic, param3 : Dynamic, param4 : Dynamic, priority : Priority) : Void
     {
+        #if cpp
+        queueMutex.acquire();
+        #end
+
         switch(priority)
         {
             case(PriorityASAP):
@@ -295,5 +392,9 @@ class RunLoop
                 queuedParams.enqueue(param3);
                 queuedParams.enqueue(param4);
         }
+
+        #if cpp
+        queueMutex.release();
+        #end
     }
 }
