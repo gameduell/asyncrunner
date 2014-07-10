@@ -33,7 +33,7 @@ class MainRunLoop extends RunLoop
         else
         {
             var timeUsed = timeOnTheNextFrame - timeInTheBeginningOfTheFrame;
-            var timeLeft = (1.0 / 60.0) - timeUsed;
+            var timeLeft = (1.0 / 60.0) - timeUsed; /// 60 fps, should be a settable variable later
             loopOnce(timeLeft);
 
         }
