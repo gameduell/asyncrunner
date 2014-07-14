@@ -129,6 +129,8 @@ class Sprite
         -halfwidth,     -halfheight,    0.0,	0.0,	0.0,	0.0,
         halfwidth,      -halfheight,    0.0,	0.0,	1.0,	0.0,
         -halfwidth,     halfheight,		0.0,	0.0,	0.0,	1.0,
+        -halfwidth,     halfheight,		0.0,	0.0,	0.0,	1.0,
+        halfwidth,      -halfheight,    0.0,	0.0,	1.0,	0.0,
         halfwidth,      halfheight,		0.0,	0.0,	1.0,	1.0
         ];
 
@@ -139,8 +141,8 @@ class Sprite
         attributeBuffer.data = new Data(vertices.length * 4);
         attributeBuffer.data.writeFloatArray(vertices, DataTypeFloat32);
 
-        meshData.vertexCount = 4;
-        meshData.primitiveType = PrimitiveTypeTriangleStrip;
+        meshData.vertexCount = 6;
+        meshData.primitiveType = PrimitiveTypeTriangles;
         meshData.indexDataType = DataTypeFloat32;
         meshData.attributeStride = 6 * 4;
 

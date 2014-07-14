@@ -40,6 +40,10 @@ class Main extends AppMain
 
     private var spriteList : Array<Sprite>;
 
+    static var gridSizeX = 10;
+    static var gridSizeY = 10;
+
+
 	override function start() : Void 
 	{
         Graphics.initialize(startAfterGraphicsIsInitialized);
@@ -67,17 +71,30 @@ class Main extends AppMain
         worldMatrix.setIdentity();
 
         graphics.setBlendFunc(BlendFactorSrcAlpha, BlendFactorOneMinusSrcAlpha);
-        var bgColor:Color4B = new Color4B();
-        bgColor.setRGBA(250,128,0,255);
-
-        graphics.setClearColor(bgColor);
 
         currentTime = Timer.stamp();
 
+        var fileList = ["player1.png", 
+                        "player2.png", 
+                        "player3.png", 
+                        "player4.png", 
+                        "player5.png", 
+                        "player6.png", 
+                        "player7.png", 
+                        "player8.png", 
+                        "player9.png", 
+                        "player10.png", 
+                        "player11.png", 
+                        "player12.png", 
+                        "player13.png"];
+
         var spriteLoadingTaskArray : Array< Task > = [];
-        for(i in 0...20)
+        for(i in 0...gridSizeX * gridSizeY)
         {
-            var sprite = new Sprite("present.png");
+            var fileIndex : Int = Std.random(fileList.length);
+            var filename = fileList[fileIndex];
+            var sprite = new Sprite(filename);
+
             var task = sprite.getLoadingTask();
             task.onFinish.add(spriteLoaded);
             spriteLoadingTaskArray.push(task);
@@ -97,10 +114,10 @@ class Main extends AppMain
     }
 
 
-    static var startingX = 300;
-    static var startingY = 300;
-    static var deltaX = 300;
-    static var deltaY = 300;
+    static var startingX = 100;
+    static var startingY = 100;
+    static var deltaX = 100;
+    static var deltaY = 100;
 	private function render () : Void
 	{
         var newCurrentTime : Float = Timer.stamp ();
@@ -117,7 +134,7 @@ class Main extends AppMain
         {
             var sprite = spriteList[i];
 
-            positionMatrix.set2D(startingX + (i / 5) * deltaX, startingY + (i % 5) * deltaY, 1, 0);
+            positionMatrix.set2D(startingX + (i / gridSizeX) * deltaX, startingY + (i % gridSizeY) * deltaY, 1, 0);
 
             resultMatrix.set(projectionMatrix);
             resultMatrix.multiply(positionMatrix);
