@@ -24,6 +24,6 @@ class FunctionTask extends Task
 
     override function execute() : Void
     {
-        runLoopForExecution.queue1(executeFuncAndExit, this, priorityForExecution);
+        runLoopForExecution.queue(executeFuncAndExit, priorityForExecution);
     }
 }
