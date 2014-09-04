@@ -7,28 +7,25 @@
 package asyncrunner;
 
 import haxe.Timer;
-import platform.Platform;
 class MainRunLoop extends RunLoop
 {
-    public function new() : Void
-    {
-        Platform.instance().onUpdate.addWithPriority(onUpdate, 2147483647); /// MAX INT
-
-        super();
-
-        firstFrameHappened = false;
-    }
-
-
     private var timeInTheBeginningOfTheFrame : Float;
     private var timeOnTheNextFrame : Float;
-    private var firstFrameHappened : Bool;
-    private function onUpdate(time : Float) : Void
+    private var firstLoopHappened : Bool;
+
+    public function new() : Void
+    {
+        super();
+
+        firstLoopHappened = false;
+    }
+
+    public function loopMainLoop(time : Float) : Void
     {
         timeOnTheNextFrame = Timer.stamp();
-        if(!firstFrameHappened)
+        if(!firstLoopHappened)
         {
-            firstFrameHappened = true;
+            firstLoopHappened = true;
         }
         else
         {
@@ -40,6 +37,8 @@ class MainRunLoop extends RunLoop
 
         timeInTheBeginningOfTheFrame = timeOnTheNextFrame;
     }
+
+
 
 
 }

@@ -7,8 +7,5 @@
     "contributors" : [ "GameDuell GmbH" ],
     "dependencies" :
     {
-
-        "polygonal-ds":""
-
     }
 }
