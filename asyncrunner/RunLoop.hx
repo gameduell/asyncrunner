@@ -16,7 +16,7 @@ import cpp.vm.Mutex;
 
 class RunLoop
 {
-    static private var mainLoop : RunLoop;
+    static private var mainLoop : MainRunLoop;
     static private var pooledRunLoop : RunLoop;
 
     #if cpp
@@ -31,7 +31,7 @@ class RunLoop
     private var queuedASAPParams : LinkedQueue< Dynamic >;
     private var queuedASAPParamCount : LinkedQueue<Int>;
 
-    static public function getMainLoop() : RunLoop
+    static public function getMainLoop() : MainRunLoop
     {
         if(mainLoop == null)
             initializeBaseRunLoops();
@@ -271,8 +271,8 @@ class RunLoop
 
         }
     }
-
-    public function queue(func : Dynamic, priority : Priority) : Void
+    
+    public function queue(func : Void->Void, priority : Priority) : Void
     {
 
         #if cpp
@@ -294,7 +294,7 @@ class RunLoop
         #end
     }
 
-    public function queue1(func : Dynamic, param : Dynamic, priority : Priority) : Void
+    public function queue1(func : Dynamic->Void, param : Dynamic, priority : Priority) : Void
     {
         #if cpp
         queueMutex.acquire();
@@ -317,7 +317,7 @@ class RunLoop
         #end
     }
 
-    public function queue2(func : Dynamic, param1 : Dynamic, param2 : Dynamic, priority : Priority) : Void
+    public function queue2(func : Dynamic->Dynamic->Void, param1 : Dynamic, param2 : Dynamic, priority : Priority) : Void
     {
         #if cpp
         queueMutex.acquire();
@@ -342,7 +342,7 @@ class RunLoop
         #end
     }
 
-    public function queue3(func : Dynamic, param1 : Dynamic, param2 : Dynamic, param3 : Dynamic, priority : Priority) : Void
+    public function queue3(func : Dynamic->Dynamic->Dynamic->Void, param1 : Dynamic, param2 : Dynamic, param3 : Dynamic, priority : Priority) : Void
     {
         #if cpp
         queueMutex.acquire();
@@ -370,7 +370,7 @@ class RunLoop
     }
 
 
-    public function queue4(func : Dynamic, param1 : Dynamic, param2 : Dynamic, param3 : Dynamic, param4 : Dynamic, priority : Priority) : Void
+    public function queue4(func : Dynamic->Dynamic->Dynamic->Dynamic->Void, param1 : Dynamic, param2 : Dynamic, param3 : Dynamic, param4 : Dynamic, priority : Priority) : Void
     {
         #if cpp
         queueMutex.acquire();

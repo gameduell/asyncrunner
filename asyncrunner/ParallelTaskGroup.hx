@@ -24,7 +24,7 @@ class ParallelTaskGroup extends Task
 
         if(tasksLeft.length == 0)
         {
-            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
+            finishExecution();
         }
     }
 

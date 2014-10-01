@@ -21,7 +21,9 @@ class Task
     }
 
     ///should be overridden by subclasses
-    public function execute() : Void
+    public function execute() : Void {}
+
+    public function finishExecution() : Void
     {
         runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
     }

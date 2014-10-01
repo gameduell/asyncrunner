@@ -26,7 +26,7 @@ class SequentialTaskGroup extends Task
 
         if(currentTaskIndex >= taskQueue.length)
         {
-            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
+            finishExecution();
         }
         else
         {
@@ -48,7 +48,7 @@ class SequentialTaskGroup extends Task
 
         if(taskQueue.length == 0)
         {
-            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
+            finishExecution();
         }
         else
         {

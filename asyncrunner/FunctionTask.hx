@@ -9,17 +9,21 @@ package asyncrunner;
 class FunctionTask extends Task
 {
     private var func : Void -> Void;
-    public function new(func : Void -> Void) : Void
+    private var callFinishExecution : Bool;
+    public function new(func : Void -> Void, callFinishExecution : Bool = true) : Void
     {
         super();
 
         this.func = func;
+        this.callFinishExecution = callFinishExecution;
     }
 
     private function executeFuncAndExit()
     {
         func();
-        runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
+
+        if(callFinishExecution)
+            finishExecution();
     }
 
     override function execute() : Void
