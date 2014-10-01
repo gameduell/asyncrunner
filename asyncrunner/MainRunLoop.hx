@@ -20,7 +20,7 @@ class DelayPriorityQueueElement implements Prioritizable
     public var priority : Float;
     public var func : Void->Void;
 
-    /// used internally by haxe
+    /// used internally by ds
     public var position : Int;
 
 
