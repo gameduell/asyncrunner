@@ -4,7 +4,6 @@
     <haxelib name="polygonal-ds" />
     <haxelib name="polygonal-printf" />
 
-    <include path="backends/asyncrunner_cpp/duell_library.xml" if="cpp" />
-    <include path="backends/asyncrunner_notcpp/duell_library.xml" if="flash || html5" />
+    <duelllib name="runloop" version="1.*.*" />
 
 </library>

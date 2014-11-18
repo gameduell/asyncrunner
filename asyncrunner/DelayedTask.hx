@@ -6,7 +6,7 @@
  */
 package asyncrunner;
 
-import asyncrunner.MainRunLoop;
+import runloop.MainRunLoop;
 
 class DelayedTask extends Task
 {

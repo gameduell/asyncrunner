@@ -7,7 +7,7 @@
 package asyncrunner;
 
 import msignal.Signal.Signal1;
-import asyncrunner.Priority;
+import runloop.Priority;
 
 class Task
 {
