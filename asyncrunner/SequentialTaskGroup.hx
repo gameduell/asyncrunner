@@ -7,11 +7,14 @@
 package asyncrunner;
 
 import asyncrunner.Task;
+import asyncrunner.TaskResult;
 
 class SequentialTaskGroup extends Task
 {
     private var taskQueue : Array<Task>;
     private var currentTaskIndex : Int;
+
+    public var failingTask(default, null): Task;
     public function new(tasks : Array<Task>) : Void
     {
         super();
@@ -26,11 +29,30 @@ class SequentialTaskGroup extends Task
 
         if(currentTaskIndex >= taskQueue.length)
         {
-            finishExecution();
+            finish();
         }
         else
         {
             executeTaskAtIndex();
+        }
+    }
+
+    private function taskFailed(task : Task) : Void
+    {
+        switch (task.result)
+        {
+            case TaskResultFailed(failureCode, failureMessage):
+            {
+                fail(failureCode, failureMessage);
+            }
+            default:
+                throw "Incorrect internal state of asyncrunner, task called failed, when it wasn't";
+        }
+
+        currentTaskIndex++;
+        for (i in currentTaskIndex...taskQueue.length)
+        {
+            taskQueue[i].cancel();
         }
     }
 
@@ -39,16 +61,17 @@ class SequentialTaskGroup extends Task
         var currentTask = taskQueue[currentTaskIndex];
 
         currentTask.onFinish.addOnce(taskFinished);
+        currentTask.onFailure.addOnce(taskFailed);
         runLoopForExecution.queue(currentTask.execute, priorityForExecution);
     }
 
-    override function execute() : Void
+    override function subclassExecute() : Void
     {
         currentTaskIndex = 0;
 
         if(taskQueue.length == 0)
         {
-            finishExecution();
+            finish();
         }
         else
         {
