@@ -17,7 +17,7 @@ class TestTaskParallel extends Task
 	override function subclassExecute()
 	{
 		testVariable++;
-		Async.delay(function() {testVariable--; finish();}, 2);
+		Async.delay(function() {testVariable--; finish();}, 3);
 	}
 }
 
@@ -47,7 +47,7 @@ class ParallelTest extends unittest.TestCase
     		taskArray.push(new TestTaskParallel());
     	}
 
-    	this.assertAsyncStart(test1, 4);
+    	this.assertAsyncStart(test1, 8);
 
     	var taskGroup = new ParallelTaskGroup(taskArray);
 
@@ -75,7 +75,7 @@ class ParallelTest extends unittest.TestCase
     	taskArray.push(failingTask);
     	taskArray.push(new TestTaskParallel());
 
-    	this.assertAsyncStart(test2_tryToFail, 4);
+    	this.assertAsyncStart(test2_tryToFail, 8);
 
     	var taskGroup = new ParallelTaskGroup(taskArray);
 
