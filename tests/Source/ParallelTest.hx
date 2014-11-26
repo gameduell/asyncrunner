@@ -6,6 +6,8 @@ import asyncrunner.Task;
 
 import asyncrunner.ParallelTaskGroup;
 
+import runloop.RunLoop;
+
 class TestTaskParallel extends Task
 {
 	public static var testVariable: Int = 0;
@@ -34,8 +36,12 @@ class TestTaskParallelFail extends Task
 	}
 }
 
+@:access(runloop.RunLoop)
 class ParallelTest extends unittest.TestCase
 {
+    override public function setup() {
+        RunLoop.getMainLoop().clear();
+    }
 
     public function test1()
     {

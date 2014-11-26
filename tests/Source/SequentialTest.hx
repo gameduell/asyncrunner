@@ -6,6 +6,8 @@ import asyncrunner.Task;
 
 import asyncrunner.SequentialTaskGroup;
 
+import runloop.RunLoop;
+
 class TestTaskSequential extends Task
 {
 	public static var testVariable: Int = 0;
@@ -17,7 +19,7 @@ class TestTaskSequential extends Task
 	override public function subclassExecute()
 	{
 		testVariable++;
-		Async.delay(function() finish(), 1.0);
+		Async.delay(function() finish(), 2.0);
 	}
 }
 
@@ -34,11 +36,16 @@ class TestTaskSequentialFail extends Task
     }
 }
 
+@:access(runloop.RunLoop)
 class SequentialTest extends unittest.TestCase
 {
+    override public function setup() {
+        RunLoop.getMainLoop().clear();
+    }
+
     public function test1()
     {
-    	/// after executing, the test variable should be 10, and then after 2 seconds, back to 0
+        TestTaskSequential.testVariable = 0;
     	var taskArray:Array<Task> = [];
 
     	for(i in 0...5)
@@ -46,7 +53,7 @@ class SequentialTest extends unittest.TestCase
     		taskArray.push(new TestTaskSequential());
     	}
 
-    	this.assertAsyncStart(test1, 6);
+    	this.assertAsyncStart(test1, 12);
 
     	var taskGroup = new SequentialTaskGroup(taskArray);
 
@@ -60,9 +67,9 @@ class SequentialTest extends unittest.TestCase
     	taskGroup.execute();
 
         Async.delay(function() assertEquals(1, TestTaskSequential.testVariable), 0.5);
-        Async.delay(function() assertEquals(2, TestTaskSequential.testVariable), 1.5);
-        Async.delay(function() assertEquals(3, TestTaskSequential.testVariable), 2.5);
-        Async.delay(function() assertEquals(4, TestTaskSequential.testVariable), 3.5);
+        Async.delay(function() assertEquals(2, TestTaskSequential.testVariable), 2.5);
+        Async.delay(function() assertEquals(3, TestTaskSequential.testVariable), 4.5);
+        Async.delay(function() assertEquals(4, TestTaskSequential.testVariable), 6.5);
     }
 
 
@@ -78,17 +85,17 @@ class SequentialTest extends unittest.TestCase
         taskArray.push(failingTask);
         taskArray.push(cancelledTask);
 
-        this.assertAsyncStart(test2_tryToFail, 4.0);
+        this.assertAsyncStart(test2_tryToFail, 8.0);
 
         var taskGroup = new SequentialTaskGroup(taskArray);
         taskGroup.execute();
 
         Async.delay(function()
         {
-            //assertTrue(Type.enumEq(successTask.result, TaskResultSuccessful));
-            //assertTrue(Type.enumEq(cancelledTask.result, TaskResultCancelled));
-            //assertTrue(Type.enumEq(failingTask.result, TaskResultFailed(0, "test")));
+            assertTrue(Type.enumEq(successTask.result, TaskResultSuccessful));
+            assertTrue(Type.enumEq(cancelledTask.result, TaskResultCancelled));
+            assertTrue(Type.enumEq(failingTask.result, TaskResultFailed(0, "test")));
             assertAsyncFinish(test2_tryToFail);
-        }, 2.0);
+        }, 6.0);
     }
 }
