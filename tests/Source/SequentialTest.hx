@@ -36,13 +36,8 @@ class TestTaskSequentialFail extends Task
     }
 }
 
-@:access(runloop.RunLoop)
 class SequentialTest extends unittest.TestCase
 {
-    override public function setup() {
-        RunLoop.getMainLoop().clear();
-    }
-
     public function test1()
     {
         TestTaskSequential.testVariable = 0;

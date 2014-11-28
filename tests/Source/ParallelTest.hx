@@ -36,13 +36,8 @@ class TestTaskParallelFail extends Task
 	}
 }
 
-@:access(runloop.RunLoop)
 class ParallelTest extends unittest.TestCase
 {
-    override public function setup() {
-        RunLoop.getMainLoop().clear();
-    }
-
     public function test1()
     {
     	/// after executing, the test variable should be 10, and then after 2 seconds, back to 0
