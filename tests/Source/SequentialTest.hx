@@ -7,6 +7,7 @@ import asyncrunner.Task;
 import asyncrunner.SequentialTaskGroup;
 
 import runloop.RunLoop;
+import runloop.Priority;
 
 class TestTaskSequential extends Task
 {
@@ -14,6 +15,8 @@ class TestTaskSequential extends Task
 	public function new()
 	{
 		super();
+        this.priorityForExecution = PriorityASAP;
+        this.priorityForFinishing = PriorityASAP;
 	}
 
 	override public function subclassExecute()
@@ -28,6 +31,8 @@ class TestTaskSequentialFail extends Task
     public function new()
     {
         super();
+        this.priorityForExecution = PriorityASAP;
+        this.priorityForFinishing = PriorityASAP;
     }
 
     override function subclassExecute()
@@ -48,7 +53,7 @@ class SequentialTest extends unittest.TestCase
     		taskArray.push(new TestTaskSequential());
     	}
 
-    	this.assertAsyncStart(test1, 15);
+    	this.assertAsyncStart(test1, 20);
 
     	var taskGroup = new SequentialTaskGroup(taskArray);
 
