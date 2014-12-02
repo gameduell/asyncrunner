@@ -61,10 +61,10 @@ class SequentialTest extends unittest.TestCase
 
     	taskGroup.execute();
 
-        Async.delay(function() assertEquals(1, TestTaskSequential.testVariable), 0.5);
-        Async.delay(function() assertEquals(2, TestTaskSequential.testVariable), 2.5);
-        Async.delay(function() assertEquals(3, TestTaskSequential.testVariable), 4.5);
-        Async.delay(function() assertEquals(4, TestTaskSequential.testVariable), 6.5);
+        Async.delay(function() assertEquals(1, TestTaskSequential.testVariable), 1.0);
+        Async.delay(function() assertEquals(2, TestTaskSequential.testVariable), 3.0);
+        Async.delay(function() assertEquals(3, TestTaskSequential.testVariable), 5.0);
+        Async.delay(function() assertEquals(4, TestTaskSequential.testVariable), 7.0);
     }
 
 
