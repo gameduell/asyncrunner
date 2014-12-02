@@ -19,7 +19,7 @@ class TestTaskSequential extends Task
 	override public function subclassExecute()
 	{
 		testVariable++;
-		Async.delay(function() finish(), 2.0);
+		Async.delay(function() finish(), 3.0);
 	}
 }
 
@@ -48,7 +48,7 @@ class SequentialTest extends unittest.TestCase
     		taskArray.push(new TestTaskSequential());
     	}
 
-    	this.assertAsyncStart(test1, 12);
+    	this.assertAsyncStart(test1, 15);
 
     	var taskGroup = new SequentialTaskGroup(taskArray);
 
@@ -61,10 +61,10 @@ class SequentialTest extends unittest.TestCase
 
     	taskGroup.execute();
 
-        Async.delay(function() assertEquals(1, TestTaskSequential.testVariable), 1.0);
-        Async.delay(function() assertEquals(2, TestTaskSequential.testVariable), 3.0);
-        Async.delay(function() assertEquals(3, TestTaskSequential.testVariable), 5.0);
-        Async.delay(function() assertEquals(4, TestTaskSequential.testVariable), 7.0);
+        Async.delay(function() assertEquals(1, TestTaskSequential.testVariable), 1.5);
+        Async.delay(function() assertEquals(2, TestTaskSequential.testVariable), 4.5);
+        Async.delay(function() assertEquals(3, TestTaskSequential.testVariable), 7.5);
+        Async.delay(function() assertEquals(4, TestTaskSequential.testVariable), 10.5);
     }
 
 
