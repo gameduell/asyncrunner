@@ -15,6 +15,7 @@ class MainTester
 
     static function start() : Void
     {
+        DuellKit.instance().onRender.add(function() trace("frame"));
         var r = new TestRunner(testComplete);
         r.add(new TaskTest());
         r.add(new DelayTest());
