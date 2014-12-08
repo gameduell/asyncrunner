@@ -6,10 +6,10 @@
 
 	<source path="Source" />
 
-	<duelllib name="duellkit" version="master" />
-	<duelllib name="unittest" version="master"/>
+	<duelllib name="duellkit" version="1.*.*" />
+	<duelllib name="unittest" version="1.*.*"/>
 	<duelllib name="asyncrunner" version="master"/>
-	<duelllib name="runloop" version="master"/>
+	<duelllib name="runloop" version="1.*.*"/>
 	
 </project>
 
