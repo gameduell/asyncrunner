@@ -7,7 +7,7 @@
 	<source path="Source" />
 
 	<duelllib name="duellkit" version="1.*.*" />
-	<duelllib name="unittest" version="2.*.*"/>
+	<duelllib name="unittest" version="1.*.*"/>
 	<duelllib name="asyncrunner" version="master"/>
 	<duelllib name="runloop" version="1.*.*"/>
 	

@@ -15,12 +15,13 @@ class MainTester
 
     static function start() : Void
     {
+        DuellKit.instance().onRender.add(function() trace("frame"));
         var r = new TestRunner(testComplete);
-        //r.add(new TaskTest());
+        r.add(new TaskTest());
         r.add(new DelayTest());
-        //r.add(new ComplexTest());
-        //r.add(new ParallelTest());
-        //r.add(new SequentialTest());
+        r.add(new ComplexTest());
+        r.add(new ParallelTest());
+        r.add(new SequentialTest());
 
         #if test
 
