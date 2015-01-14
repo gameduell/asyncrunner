@@ -12,10 +12,10 @@ class DelayTest extends unittest.TestCase
     	for (i in 0...50)
     	{
     		var delay = Math.random() * 20;
-    		var tracker: TimeTracker = {expectedTime: runloop.RunLoop.getMainLoop().timeOfLoopStart + delay, actualTime: 0.0};
+    		var tracker: TimeTracker = {expectedTime: haxe.Timer.stamp() + delay, actualTime: 0.0};
     		trackers.push(tracker);
 	        Async.delay(function() {
-	        	tracker.actualTime = runloop.RunLoop.getMainLoop().timeOfLoopStart;
+	        	tracker.actualTime = haxe.Timer.stamp();
 			}, delay);
     	}
 
