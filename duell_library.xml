@@ -4,6 +4,6 @@
     <haxelib name="polygonal-ds" />
     <haxelib name="polygonal-printf" />
 
-    <duelllib name="runloop" version="1.*.*" />
+    <duelllib name="runloop" version="1.0.0+" />
 
 </library>
