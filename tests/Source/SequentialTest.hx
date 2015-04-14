@@ -53,7 +53,7 @@ class SequentialTest extends unittest.TestCase
     		taskArray.push(new TestTaskSequential());
     	}
 
-    	this.assertAsyncStart(test1, 20);
+    	this.assertAsyncStart("test1", 20);
 
     	var taskGroup = new SequentialTaskGroup(taskArray);
 
@@ -61,7 +61,7 @@ class SequentialTest extends unittest.TestCase
     		function(task: Task)
     		{
 	    		assertEquals(5, TestTaskSequential.testVariable);
-	    		assertAsyncFinish(test1);
+	    		assertAsyncFinish("test1");
     		});
 
     	taskGroup.execute();
@@ -85,7 +85,7 @@ class SequentialTest extends unittest.TestCase
         taskArray.push(failingTask);
         taskArray.push(cancelledTask);
 
-        this.assertAsyncStart(test2_tryToFail, 8.0);
+        this.assertAsyncStart("test2_tryToFail", 8.0);
 
         var taskGroup = new SequentialTaskGroup(taskArray);
         taskGroup.execute();
@@ -95,7 +95,7 @@ class SequentialTest extends unittest.TestCase
             assertTrue(Type.enumEq(successTask.result, TaskResultSuccessful));
             assertTrue(Type.enumEq(cancelledTask.result, TaskResultCancelled));
             assertTrue(Type.enumEq(failingTask.result, TaskResultFailed(0, "test")));
-            assertAsyncFinish(test2_tryToFail);
+            assertAsyncFinish("test2_tryToFail");
         }, 6.0);
     }
 }

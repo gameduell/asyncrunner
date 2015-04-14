@@ -56,10 +56,10 @@ class ParallelTest extends unittest.TestCase
     		function(task: Task)
     		{
 	    		this.assertEquals(0, TestTaskParallel.testVariable);
-	    		this.assertAsyncFinish(test1);
+	    		this.assertAsyncFinish("test1");
     		});
 
-    	taskGroup.execute();	
+    	taskGroup.execute();
 
     	Async.delay(function() {
     		this.assertEquals(10, TestTaskParallel.testVariable);
@@ -76,7 +76,7 @@ class ParallelTest extends unittest.TestCase
     	taskArray.push(failingTask);
     	taskArray.push(new TestTaskParallel());
 
-    	this.assertAsyncStart(test2_tryToFail, 8);
+    	this.assertAsyncStart("test2_tryToFail", 8);
 
     	var taskGroup = new ParallelTaskGroup(taskArray);
 
@@ -85,7 +85,7 @@ class ParallelTest extends unittest.TestCase
     		{
     			assertEquals(failingTask, cast taskGroup.tasksThatFailed[0]);
     			assertEquals(1, taskGroup.tasksThatFailed.length);
-    			assertAsyncFinish(test2_tryToFail);
+    			assertAsyncFinish("test2_tryToFail");
     		});
 
     	taskGroup.execute();

@@ -9,7 +9,7 @@ class TaskTest extends unittest.TestCase
     {
         Async.run(function() assertAsyncFinish(test1_simpleRun));
 
-        assertAsyncStart(test1_simpleRun, 2);
+        assertAsyncStart("test1_simpleRun", 2);
     }
 
     public function test2_cancel()
@@ -19,7 +19,7 @@ class TaskTest extends unittest.TestCase
 
         func.cancel();
 
-        assertAsyncStart(test2_cancel, 2);
+        assertAsyncStart("test2_cancel", 2);
     }
 
     public function test3_fail()
@@ -30,30 +30,30 @@ class TaskTest extends unittest.TestCase
 
         func.fail(0, null);
 
-        assertAsyncStart(test3_fail, 2);
+        assertAsyncStart("test3_fail", 2);
     }
-    
+
     public function test4_failMessage()
     {
         var failMessage = "an errorMessage";
         var failCode = 255;
 
-        var func = Async.run(function() assertAsyncFinish(test3_fail));
+        var func = Async.run(function() assertAsyncFinish("test3_fail"));
 
         func.fail(failCode, failMessage);
 
         assertTrue(Type.enumEq(TaskResultFailed(failCode, failMessage), func.result));
     }
-    
+
 
     public function test5_cancelAllFromCategory()
     {
         var category = Async.getUniqueTaskCategoryID();
         assertShouldFail();
 
-        Async.run(function() assertAsyncFinish(test5_cancelAllFromCategory), category);
+        Async.run(function() assertAsyncFinish("test5_cancelAllFromCategory"), category);
         Async.cancelAllTasksOfCategory(category);
 
-        assertAsyncStart(test5_cancelAllFromCategory, 2);
+        assertAsyncStart("test5_cancelAllFromCategory", 2);
     }
 }

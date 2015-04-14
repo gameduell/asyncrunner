@@ -24,11 +24,11 @@ class ComplexTest extends unittest.TestCase
 
         Async.cancelAllTasksOfCategory(categoryToBeCancelled);
 
-        this.assertAsyncStart(test1_cancelAllFromCategoryMoreComplex, 3);
+        this.assertAsyncStart("test1_cancelAllFromCategoryMoreComplex", 3);
 
         Async.delay(function() {
             assertEquals(5, counter);
-            assertAsyncFinish(test1_cancelAllFromCategoryMoreComplex);
+            assertAsyncFinish("test1_cancelAllFromCategoryMoreComplex");
         }, 2);
     }
 }

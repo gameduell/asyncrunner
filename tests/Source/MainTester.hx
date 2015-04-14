@@ -15,7 +15,7 @@ class MainTester
 
     static function start() : Void
     {
-        var r = new TestRunner(testComplete);
+        var r = new TestRunner(testComplete, DuellKit.instance().onError);
         r.add(new TaskTest());
         r.add(new DelayTest());
         r.add(new ComplexTest());
