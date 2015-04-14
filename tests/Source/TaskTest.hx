@@ -7,7 +7,7 @@ class TaskTest extends unittest.TestCase
 {
     public function test1_simpleRun()
     {
-        Async.run(function() assertAsyncFinish(test1_simpleRun));
+        Async.run(function() assertAsyncFinish("test1_simpleRun"));
 
         assertAsyncStart("test1_simpleRun", 2);
     }
@@ -15,7 +15,7 @@ class TaskTest extends unittest.TestCase
     public function test2_cancel()
     {
         assertShouldFail();
-        var func = Async.run(function() assertAsyncFinish(test2_cancel));
+        var func = Async.run(function() assertAsyncFinish("test2_cancel"));
 
         func.cancel();
 
@@ -26,7 +26,7 @@ class TaskTest extends unittest.TestCase
     {
         assertShouldFail();
 
-        var func = Async.run(function() assertAsyncFinish(test3_fail));
+        var func = Async.run(function() assertAsyncFinish("test3_fail"));
 
         func.fail(0, null);
 

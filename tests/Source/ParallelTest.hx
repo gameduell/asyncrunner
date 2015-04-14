@@ -48,7 +48,7 @@ class ParallelTest extends unittest.TestCase
     		taskArray.push(new TestTaskParallel());
     	}
 
-    	this.assertAsyncStart(test1, 8);
+    	this.assertAsyncStart("test1", 8);
 
     	var taskGroup = new ParallelTaskGroup(taskArray);
 
