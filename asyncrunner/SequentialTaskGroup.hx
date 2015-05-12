@@ -65,6 +65,16 @@ class SequentialTaskGroup extends Task
         runLoopForExecution.queue(currentTask.execute, priorityForExecution);
     }
 
+    override function cancel(): Void
+    {
+        super.cancel();
+
+        for (i in currentTaskIndex...taskQueue.length)
+        {
+            taskQueue[i].cancel();
+        }
+    }
+
     override function subclassExecute() : Void
     {
         currentTaskIndex = 0;
