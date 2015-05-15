@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library>
 
-    <haxelib name="polygonal-ds" version="1.4.1" />
+    <duelllib name="polygonal-ds" version="2.0.0+" />
     <haxelib name="polygonal-printf" version="1.0.2-beta" />
 
-    <duelllib name="runloop" version="1.0.0+" />
+    <duelllib name="runloop" version="2.0.0+" />
 
 </library>
