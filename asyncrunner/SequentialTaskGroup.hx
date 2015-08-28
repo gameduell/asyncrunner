@@ -39,6 +39,7 @@ class SequentialTaskGroup extends Task
 
     private function taskFailed(task : Task) : Void
     {
+        failingTask = task;
         switch (task.result)
         {
             case TaskResultFailed(failureCode, failureMessage):
