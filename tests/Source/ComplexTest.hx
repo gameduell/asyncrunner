@@ -1,4 +1,4 @@
-import duell.DuellKit;
+import duellkit.DuellKit;
 
 import asyncrunner.Async;
 import asyncrunner.TaskResult;
@@ -8,7 +8,7 @@ class ComplexTest extends unittest.TestCase
     public function test1_cancelAllFromCategoryMoreComplex()
     {
         assertTrue(true);
-        /*var counter = 10;
+        var counter = 10;
 
         /// This function is scheduled to be executed 5 times with one category, and 5 times with another.
         /// Only one category should be succesfully executed, so in the end the counter should be 5
@@ -30,6 +30,6 @@ class ComplexTest extends unittest.TestCase
         Async.delay(function() {
             assertEquals(5, counter);
             assertAsyncFinish("test1_cancelAllFromCategoryMoreComplex");
-        }, 2);*/
+        }, 2);
     }
 }

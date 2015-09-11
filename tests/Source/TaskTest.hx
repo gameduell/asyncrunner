@@ -1,4 +1,4 @@
-import duell.DuellKit;
+import duellkit.DuellKit;
 
 import asyncrunner.Async;
 import asyncrunner.TaskResult;
@@ -48,13 +48,12 @@ class TaskTest extends unittest.TestCase
 
     public function test5_cancelAllFromCategory()
     {
-        assertTrue(true);
-        /*var category = Async.getUniqueTaskCategoryID();
+        var category = Async.getUniqueTaskCategoryID();
         assertShouldFail();
 
         Async.run(function() assertAsyncFinish("test5_cancelAllFromCategory"), category);
         Async.cancelAllTasksOfCategory(category);
 
-        assertAsyncStart("test5_cancelAllFromCategory", 2);*/
+        assertAsyncStart("test5_cancelAllFromCategory", 2);
     }
 }
