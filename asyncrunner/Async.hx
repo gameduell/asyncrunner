@@ -57,7 +57,7 @@ class Async
         var list: SLL<Task>;
         if (!tasksAndCategories.exists(task.category))
         {
-            list = new SLL();
+            list = new SLL<Task>();
             tasksAndCategories.set(task.category, list);
         }  
         else
