@@ -22,17 +22,15 @@ class MainTester
         r.add(new ParallelTest());
         r.add(new SequentialTest());
 
-        #if test
-
+        //HTTPLogger are supported on devices with android versions >= 5.0
         #if jenkins
-        r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
+            r.addLogger(new TestHTTPLogger(new TestJUnitLogger()));
         #else
-        r.addLogger(new TestHTTPLogger(new TestSimpleLogger()));
+            r.addLogger(new TestHTTPLogger(new TestSimpleLogger()));
         #end
 
-        #else
-        r.addLogger(new TestSimpleLogger());
-        #end
+        //If you want to run the tests on devices with android version < 5.0, uncomment the following line
+        //r.addLogger(new TestSimpleLogger());
 
         r.run();
     }
