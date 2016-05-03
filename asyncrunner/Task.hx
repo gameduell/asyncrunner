@@ -40,6 +40,7 @@ class Task
     /// is called when the task completes its execution
     public var onFinish : Signal1<Task>;
     public var onFailure : Signal1<Task>;
+    public var onCancelled : Signal1<Task>;
 
     public var priorityForExecution : Priority;
     public var priorityForFinishing : Priority;
@@ -49,7 +50,7 @@ class Task
 
     @:isVar
     public var result(get, set): TaskResult = TaskResultPending;
-    
+
     public var category(default, null): TaskCategoryID = 0;
 
     public var callbacksEnabled(null, set): Bool = true;
@@ -60,6 +61,7 @@ class Task
         this.category = category;
         onFinish = new Signal1<Task>();
         onFailure = new Signal1<Task>();
+        onCancelled = new Signal1<Task>();
         priorityForExecution = PriorityLow;
         priorityForFinishing = PriorityLow;
         runLoopForExecution = RunLoop.getMainLoop();
@@ -68,11 +70,11 @@ class Task
         Async.addTaskToCategoryBookKeeping(this);
     }
 
-    public function execute(): Void 
+    public function execute(): Void
     {
         switch(result)
         {
-            case TaskResultCancelled, 
+            case TaskResultCancelled,
                  TaskResultFailed(_, _),
                  TaskResultSuccessful:
                 return;
@@ -80,6 +82,14 @@ class Task
                 subclassExecute();
                 return;
         }
+    }
+
+    ///should be overridden
+    public function executeSynchronous(): Void
+    {
+        #if debug
+            throw "Task does not support synchronous execution";
+        #end
     }
 
     ///should be overridden
@@ -98,6 +108,7 @@ class Task
                 return;
             case TaskResultPending:
                 result = TaskResultCancelled;
+                callCancelledCallback();
                 return;
         }
     }
@@ -137,16 +148,53 @@ class Task
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
+            runLoopForFinishing.queue(function() {
+                onFinish.dispatch(this);
+                cleanUpCallbacks();
+            }, priorityForFinishing);
         }
+        else
+        {
+            cleanUpCallbacks();
+        }
+
     }
 
     private function callFailCallback(): Void
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue1(onFailure.dispatch, this, priorityForFinishing);
+            runLoopForFinishing.queue(function() {
+                onFailure.dispatch(this);
+                cleanUpCallbacks();
+            }, priorityForFinishing);
         }
+        else
+        {
+            cleanUpCallbacks();
+        }
+    }
+
+    private function callCancelledCallback(): Void
+    {
+        if (isCallbacksEnabled())
+        {
+            runLoopForFinishing.queue(function() {
+                onCancelled.dispatch(this);
+                cleanUpCallbacks(); 
+            }, priorityForFinishing);
+        }
+        else
+        {
+            cleanUpCallbacks();
+        }
+    }
+
+    private function cleanUpCallbacks(): Void
+    {
+        onCancelled.removeAll();
+        onFinish.removeAll();
+        onFailure.removeAll();
     }
 
     public function isCallbacksEnabled(): Bool
@@ -161,12 +209,12 @@ class Task
 
     private function set_result(newResult: TaskResult): TaskResult
     {
-        switch ([result, newResult]) 
+        switch ([result, newResult])
         {
             case [TaskResultPending, _]:
                 result = newResult;
             default:
-                throw "Incorrect state on task, task result should only go from pending to any other state"; 
+                throw "Incorrect state on task, task result should only go from pending to any other state";
         }
 
         return result;
