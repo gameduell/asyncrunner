@@ -43,7 +43,7 @@ class DelayedTask extends Task
         task = taskToDelay;
 
         super(taskToDelay.category);
-        
+
         this.delaySeconds = delaySeconds;
 
         taskToDelay.onFinish.add(this.onFinish.dispatch);
@@ -53,6 +53,11 @@ class DelayedTask extends Task
     override function subclassExecute(): Void
     {
         RunLoop.getMainLoop().delay(task.execute, delaySeconds);
+    }
+
+    override function executeSynchronous(): Void
+    {
+        task.executeSynchronous();
     }
 
     override public function cancel(): Void

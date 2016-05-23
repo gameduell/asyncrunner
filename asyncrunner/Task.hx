@@ -40,6 +40,7 @@ class Task
     /// is called when the task completes its execution
     public var onFinish : Signal1<Task>;
     public var onFailure : Signal1<Task>;
+    public var onCancelled : Signal1<Task>;
 
     public var priorityForExecution : Priority;
     public var priorityForFinishing : Priority;
@@ -60,6 +61,7 @@ class Task
         this.category = category;
         onFinish = new Signal1<Task>();
         onFailure = new Signal1<Task>();
+        onCancelled = new Signal1<Task>();
         priorityForExecution = PriorityLow;
         priorityForFinishing = PriorityLow;
         runLoopForExecution = RunLoop.getMainLoop();
@@ -83,6 +85,14 @@ class Task
     }
 
     ///should be overridden
+    public function executeSynchronous(): Void
+    {
+        #if debug
+            throw "Task does not support synchronous execution";
+        #end
+    }
+
+    ///should be overridden
     private function subclassExecute()
     {
 
@@ -98,6 +108,7 @@ class Task
                 return;
             case TaskResultPending:
                 result = TaskResultCancelled;
+                callCancelledCallback();
                 return;
         }
     }
@@ -137,16 +148,53 @@ class Task
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue1(onFinish.dispatch, this, priorityForFinishing);
+            runLoopForFinishing.queue(function() {
+                onFinish.dispatch(this);
+                cleanUpCallbacks();
+            }, priorityForFinishing);
         }
+        else
+        {
+            cleanUpCallbacks();
+        }
+
     }
 
     private function callFailCallback(): Void
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue1(onFailure.dispatch, this, priorityForFinishing);
+            runLoopForFinishing.queue(function() {
+                onFailure.dispatch(this);
+                cleanUpCallbacks();
+            }, priorityForFinishing);
         }
+        else
+        {
+            cleanUpCallbacks();
+        }
+    }
+
+    private function callCancelledCallback(): Void
+    {
+        if (isCallbacksEnabled())
+        {
+            runLoopForFinishing.queue(function() {
+                onCancelled.dispatch(this);
+                cleanUpCallbacks(); 
+            }, priorityForFinishing);
+        }
+        else
+        {
+            cleanUpCallbacks();
+        }
+    }
+
+    private function cleanUpCallbacks(): Void
+    {
+        onCancelled.removeAll();
+        onFinish.removeAll();
+        onFailure.removeAll();
     }
 
     public function isCallbacksEnabled(): Bool

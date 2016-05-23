@@ -88,12 +88,40 @@ class SequentialTaskGroup extends Task
 
     override function cancel(): Void
     {
-        super.cancel();
-
         for (i in currentTaskIndex...taskQueue.length)
         {
             taskQueue[i].cancel();
         }
+
+        super.cancel();
+    }
+
+    override function executeSynchronous(): Void
+    {
+        for (taskIndex in 0...taskQueue.length)
+        {
+            var task = taskQueue[taskIndex];
+
+            task.executeSynchronous();
+
+            switch (task.result)
+            {
+                case TaskResultFailed(failureCode, failureMessage):
+                {
+                    fail(failureCode, failureMessage);
+
+                    for (i in (taskIndex + 1)...taskQueue.length)
+                    {
+                        taskQueue[i].cancel();
+                    }
+
+                    return;
+                }
+                default:
+            }
+        }
+
+        finish();
     }
 
     override function subclassExecute() : Void

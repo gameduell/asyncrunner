@@ -86,6 +86,34 @@ class ParallelTaskGroup extends Task
         }
     }
 
+    override function executeSynchronous(): Void
+    {
+        for (taskIndex in 0...tasksLeft.length)
+        {
+            var task = tasksLeft[taskIndex];
+
+            task.executeSynchronous();
+
+            switch (task.result)
+            {
+                case TaskResultFailed(failureCode, failureMessage):
+                {
+                    fail(failureCode, failureMessage);
+
+                    for (i in (taskIndex + 1)...tasksLeft.length)
+                    {
+                        tasksLeft[i].cancel();
+                    }
+
+                    return;
+                }
+                default:
+            }
+        }
+
+        finish();
+    }
+
     override public function cancel(): Void
     {
         for (task in tasksLeft)
