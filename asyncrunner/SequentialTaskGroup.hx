@@ -83,7 +83,8 @@ class SequentialTaskGroup extends Task
 
         currentTask.onFinish.addOnce(taskFinished);
         currentTask.onFailure.addOnce(taskFailed);
-        runLoopForExecution.queue(currentTask.execute, priorityForExecution);
+
+        currentTask.execute();
     }
 
     override function cancel(): Void
@@ -129,7 +130,7 @@ class SequentialTaskGroup extends Task
     {
         currentTaskIndex = 0;
 
-        if(taskQueue.length == 0)
+        if (taskQueue.length == 0)
         {
             finish();
         }

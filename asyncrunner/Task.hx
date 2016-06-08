@@ -148,10 +148,10 @@ class Task
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue(function() {
+            queueForFinishingIfNeeded(function() {
                 onFinish.dispatch(this);
                 cleanUpCallbacks();
-            }, priorityForFinishing);
+            });
         }
         else
         {
@@ -164,10 +164,10 @@ class Task
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue(function() {
+            queueForFinishingIfNeeded(function() {
                 onFailure.dispatch(this);
                 cleanUpCallbacks();
-            }, priorityForFinishing);
+            });
         }
         else
         {
@@ -179,14 +179,26 @@ class Task
     {
         if (isCallbacksEnabled())
         {
-            runLoopForFinishing.queue(function() {
+            queueForFinishingIfNeeded(function() {
                 onCancelled.dispatch(this);
-                cleanUpCallbacks(); 
-            }, priorityForFinishing);
+                cleanUpCallbacks();
+            });
         }
         else
         {
             cleanUpCallbacks();
+        }
+    }
+
+    private function queueForFinishingIfNeeded(func: Void -> Void)
+    {
+        if (runLoopForExecution == runLoopForFinishing)
+        {
+            func();
+        }
+        else
+        {
+            runLoopForFinishing.queue(func, priorityForFinishing);
         }
     }
 
