@@ -98,9 +98,10 @@ class SequentialTaskGroup extends Task
 
     override function executeSynchronous(): Void
     {
-        for (taskIndex in 0...taskQueue.length)
+        var taskIndex = 0;
+        while (taskIndex < taskQueue.length)
         {
-            var task = taskQueue[taskIndex];
+            var task = taskQueue[taskIndex++];
 
             task.executeSynchronous();
 
