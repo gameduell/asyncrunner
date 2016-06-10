@@ -50,6 +50,12 @@ class DelayedTask extends Task
         taskToDelay.onFailure.add(this.onFailure.dispatch);
     }
 
+	private function cleanup(): Void
+	{
+		task.onFinish.remove(this.onFinish.dispatch);
+        task.onFailure.remove(this.onFailure.dispatch);
+	}
+
     override function subclassExecute(): Void
     {
         RunLoop.getMainLoop().delay(task.execute, delaySeconds);
@@ -63,16 +69,19 @@ class DelayedTask extends Task
     override public function cancel(): Void
     {
         task.cancel();
+		cleanup();
     }
 
     override public function fail(?failureCode: Int, ?failureMessage: String): Void
     {
         task.fail();
+		cleanup();
     }
 
     override public function finish(): Void
     {
         task.finish();
+		cleanup();
     }
 
     override public function isPending(): Bool
