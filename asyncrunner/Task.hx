@@ -150,12 +150,12 @@ class Task
         {
             runLoopForFinishing.queue(function() {
                 onFinish.dispatch(this);
-                cleanUpCallbacks();
+                cleanUp();
             }, priorityForFinishing);
         }
         else
         {
-            cleanUpCallbacks();
+            cleanUp();
         }
 
     }
@@ -166,12 +166,12 @@ class Task
         {
             runLoopForFinishing.queue(function() {
                 onFailure.dispatch(this);
-                cleanUpCallbacks();
+                cleanUp();
             }, priorityForFinishing);
         }
         else
         {
-            cleanUpCallbacks();
+            cleanUp();
         }
     }
 
@@ -181,17 +181,19 @@ class Task
         {
             runLoopForFinishing.queue(function() {
                 onCancelled.dispatch(this);
-                cleanUpCallbacks(); 
+                cleanUp(); 
             }, priorityForFinishing);
         }
         else
         {
-            cleanUpCallbacks();
+            cleanUp();
         }
     }
 
-    private function cleanUpCallbacks(): Void
+    private function cleanUp(): Void
     {
+        Async.removeTaskFromCategoryBookKeeping(this);
+        
         onCancelled.removeAll();
         onFinish.removeAll();
         onFailure.removeAll();
