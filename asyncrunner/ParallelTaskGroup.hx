@@ -78,6 +78,12 @@ class ParallelTaskGroup extends Task
 
     override function subclassExecute() : Void
     {
+        if (tasksLeft.length == 0)
+        {
+            finish();
+            return;
+        }
+        
         for(task in tasksLeft)
         {
             task.onFinish.addOnce(taskFinished);
