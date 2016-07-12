@@ -50,7 +50,7 @@ class Task
 
     @:isVar
     public var result(get, set): TaskResult = TaskResultPending;
-    
+
     public var category(default, null): TaskCategoryID = 0;
 
     public var callbacksEnabled(null, set): Bool = true;
@@ -70,11 +70,11 @@ class Task
         Async.addTaskToCategoryBookKeeping(this);
     }
 
-    public function execute(): Void 
+    public function execute(): Void
     {
         switch(result)
         {
-            case TaskResultCancelled, 
+            case TaskResultCancelled,
                  TaskResultFailed(_, _),
                  TaskResultSuccessful:
                 return;
@@ -204,6 +204,8 @@ class Task
 
     private function cleanUpCallbacks(): Void
     {
+        Async.removeTaskFromCategoryBookKeeping(this);
+
         onCancelled.removeAll();
         onFinish.removeAll();
         onFailure.removeAll();
@@ -221,12 +223,12 @@ class Task
 
     private function set_result(newResult: TaskResult): TaskResult
     {
-        switch ([result, newResult]) 
+        switch ([result, newResult])
         {
             case [TaskResultPending, _]:
                 result = newResult;
             default:
-                throw "Incorrect state on task, task result should only go from pending to any other state"; 
+                throw "Incorrect state on task, task result should only go from pending to any other state";
         }
 
         return result;
