@@ -83,7 +83,8 @@ class SequentialTaskGroup extends Task
 
         currentTask.onFinish.addOnce(taskFinished);
         currentTask.onFailure.addOnce(taskFailed);
-        runLoopForExecution.queue(currentTask.execute, priorityForExecution);
+
+        currentTask.execute();
     }
 
     override function cancel(): Void
@@ -98,9 +99,10 @@ class SequentialTaskGroup extends Task
 
     override function executeSynchronous(): Void
     {
-        for (taskIndex in 0...taskQueue.length)
+        var taskIndex = 0;
+        while (taskIndex < taskQueue.length)
         {
-            var task = taskQueue[taskIndex];
+            var task = taskQueue[taskIndex++];
 
             task.executeSynchronous();
 
@@ -128,7 +130,7 @@ class SequentialTaskGroup extends Task
     {
         currentTaskIndex = 0;
 
-        if(taskQueue.length == 0)
+        if (taskQueue.length == 0)
         {
             finish();
         }
