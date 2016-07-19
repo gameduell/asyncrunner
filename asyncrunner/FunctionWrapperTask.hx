@@ -41,7 +41,7 @@ class FunctionWrapperTask extends Task
 
     override function subclassExecute(): Void
     {
-        runLoopForExecution.queue(executeFuncAndExit.bind(true), priorityForExecution);
+        runLoopForExecution.queue(executeFuncAndExit.bind(false), priorityForExecution);
     }
 
     override function executeSynchronous(): Void
