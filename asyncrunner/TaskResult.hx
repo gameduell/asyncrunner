@@ -28,6 +28,7 @@ package asyncrunner;
 
 enum TaskResult
 {
+	TaskResultNotStarted;
 	TaskResultPending;
 	TaskResultCancelled;
 	TaskResultFailed(failureCode: Int, failureMessage: String);

@@ -83,7 +83,7 @@ class ParallelTaskGroup extends Task
             finish();
             return;
         }
-        
+
         for(task in tasksLeft)
         {
             task.onFinish.addOnce(taskFinished);
@@ -92,7 +92,7 @@ class ParallelTaskGroup extends Task
         }
     }
 
-    override function executeSynchronous(): Void
+    override function subclassExecuteSynchronous(): Void
     {
         for (taskIndex in 0...tasksLeft.length)
         {

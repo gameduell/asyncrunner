@@ -58,12 +58,12 @@ class DelayedTask extends Task
 
     override function subclassExecute(): Void
     {
-        RunLoop.getMainLoop().delay(task.execute, delaySeconds);
+        RunLoop.getMainLoop().delay(task.subclassExecute, delaySeconds);
     }
 
-    override function executeSynchronous(): Void
+    override function subclassExecuteSynchronous(): Void
     {
-        task.executeSynchronous();
+        task.subclassExecuteSynchronous();
     }
 
     override public function cancel(): Void

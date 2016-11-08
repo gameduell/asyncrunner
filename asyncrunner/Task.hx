@@ -49,7 +49,7 @@ class Task
     public var runLoopForFinishing : RunLoop;
 
     @:isVar
-    public var result(get, set): TaskResult = TaskResultPending;
+    public var result(get, set): TaskResult = TaskResultNotStarted;
 
     public var category(default, null): TaskCategoryID = 0;
 
@@ -57,7 +57,6 @@ class Task
 
     public function new(category: TaskCategoryID = 0)
     {
-        result = TaskResultPending;
         this.category = category;
         onFinish = new Signal1<Task>();
         onFailure = new Signal1<Task>();
@@ -74,28 +73,51 @@ class Task
     {
         switch(result)
         {
-            case TaskResultCancelled,
-                 TaskResultFailed(_, _),
-                 TaskResultSuccessful:
+            case
+                TaskResultCancelled,
+                TaskResultFailed(_, _),
+                TaskResultSuccessful,
+                TaskResultPending:
                 return;
-            case TaskResultPending:
+            case
+                TaskResultNotStarted:
+                result = TaskResultPending;
                 subclassExecute();
                 return;
         }
     }
 
-    ///should be overridden
     public function executeSynchronous(): Void
     {
-        #if debug
-            throw "Task does not support synchronous execution";
-        #end
+        switch(result)
+        {
+            case
+                TaskResultCancelled,
+                TaskResultFailed(_, _),
+                TaskResultSuccessful,
+                TaskResultPending:
+                return;
+            case
+                TaskResultNotStarted:
+
+                result = TaskResultPending;
+                subclassExecuteSynchronous();
+                return;
+        }
     }
 
     ///should be overridden
     private function subclassExecute()
     {
 
+    }
+
+    ///should be overridden
+    private function subclassExecuteSynchronous()
+    {
+        #if debug
+            throw "Task does not support synchronous execution";
+        #end
     }
 
     public function cancel(): Void
@@ -106,7 +128,8 @@ class Task
                  TaskResultCancelled,
                  TaskResultFailed(_, _):
                 return;
-            case TaskResultPending:
+            case TaskResultPending,
+                 TaskResultNotStarted:
                 result = TaskResultCancelled;
                 callCancelledCallback();
                 return;
@@ -225,7 +248,10 @@ class Task
     {
         switch ([result, newResult])
         {
-            case [TaskResultPending, _]:
+            case
+                [TaskResultPending, _],
+                [TaskResultNotStarted, TaskResultPending],
+                [TaskResultNotStarted, TaskResultCancelled]:
                 result = newResult;
             default:
                 throw "Incorrect state on task, task result should only go from pending to any other state";
