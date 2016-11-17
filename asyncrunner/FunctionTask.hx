@@ -53,7 +53,10 @@ class FunctionTask extends Task
 
     private function executeFuncAndExit(): Void
     {
-        func();
+        if (func != null)
+        {
+            func();
+        }
 
         if(callFinish)
         {
