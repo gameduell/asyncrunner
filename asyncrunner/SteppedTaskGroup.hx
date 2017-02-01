@@ -28,27 +28,6 @@ class SteppedTaskGroup extends SequentialTaskGroup
         super(tasksToRun);
     }
 
-    override public function cancel(): Void
-    {
-        currentStepIndex = 0;
-
-        super.cancel();
-    }
-
-    override public function fail(?failureCode: Int, ?failureMessage: String): Void
-    {
-        currentStepIndex = 0;
-
-        super.fail(failureCode, failureMessage);
-    }
-
-    override public function finish(): Void
-    {
-        currentStepIndex = 0;
-
-        super.finish();
-    }
-
     public function unblockAllSteps(): Void
     {
         for (i in 0 ... blockingTasks.length)
