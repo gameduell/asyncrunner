@@ -31,8 +31,10 @@ import asyncrunner.Task;
 
 class BlockingTask extends Task
 {
-    private var blocked: Bool;
+    public var blocked (default, null): Bool;
+
     private var executeCalled: Bool;
+
     public function new(): Void
     {
         super(category);
