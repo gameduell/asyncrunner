@@ -31,8 +31,10 @@ import asyncrunner.Task;
 
 class BlockingTask extends Task
 {
-    private var blocked: Bool;
+    public var blocked (default, null): Bool;
+
     private var executeCalled: Bool;
+
     public function new(): Void
     {
         super(category);
@@ -47,22 +49,10 @@ class BlockingTask extends Task
 
         if (executeCalled)
         {
-            callFinish();
-        }
-    }
-
-    private function callFinish(): Void
-    {
-        switch(result)
-        {
-            case TaskResultCancelled,
-                 TaskResultFailed(_, _),
-                 TaskResultSuccessful:
-                return;
-            case TaskResultPending:
-
+            if (result == TaskResultPending)
+            {
                 finish();
-                return;
+            }
         }
     }
 
@@ -71,16 +61,16 @@ class BlockingTask extends Task
         executeCalled = true;
         if (!blocked)
         {
-            callFinish();
+            finish();
         }
     }
 
-    override function executeSynchronous(): Void
+    override function subclassExecuteSynchronous(): Void
     {
         executeCalled = true;
         if (!blocked)
         {
-            callFinish();
+            finish();
         }
     }
 }

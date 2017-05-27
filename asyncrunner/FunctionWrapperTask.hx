@@ -44,36 +44,27 @@ class FunctionWrapperTask extends Task
         runLoopForExecution.queue(executeFuncAndExit.bind(false), priorityForExecution);
     }
 
-    override function executeSynchronous(): Void
+    override function subclassExecuteSynchronous(): Void
     {
         executeFuncAndExit(true);
     }
 
     private function executeFuncAndExit(synchronous: Bool): Void
     {
-        switch(result)
+        var task = func();
+
+        task.onFinish.addOnce(taskFinished);
+        task.onFailure.addOnce(taskFailed);
+        if (synchronous)
         {
-            case TaskResultCancelled,
-                 TaskResultFailed(_, _),
-                 TaskResultSuccessful:
-                return;
-            case TaskResultPending:
-
-                var task = func();
-
-                task.onFinish.addOnce(taskFinished);
-                task.onFailure.addOnce(taskFailed);
-                if (synchronous)
-                {
-                    task.executeSynchronous();
-                }
-                else
-                {
-                    task.execute();
-                }
-
-                return;
+            task.executeSynchronous();
         }
+        else
+        {
+            task.execute();
+        }
+
+        return;
     }
 
     private function taskFailed(task : Task) : Void
@@ -96,13 +87,7 @@ class FunctionWrapperTask extends Task
 
     override function set_result(newResult: TaskResult): TaskResult
     {
-        switch ([result, newResult])
-        {
-            case [TaskResultPending, _]:
-                result = newResult;
-            default:
-                throw "Incorrect state on task, task result should only go from pending to any other state";
-        }
+        super.set_result(newResult);
 
         switch(result)
         {

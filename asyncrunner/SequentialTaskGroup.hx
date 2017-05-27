@@ -97,7 +97,7 @@ class SequentialTaskGroup extends Task
         super.cancel();
     }
 
-    override function executeSynchronous(): Void
+    override function subclassExecuteSynchronous(): Void
     {
         var taskIndex = 0;
         while (taskIndex < taskQueue.length)

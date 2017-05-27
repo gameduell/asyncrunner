@@ -46,45 +46,34 @@ class FunctionTask extends Task
         runLoopForExecution.queue(executeFuncAndExit, priorityForExecution);
     }
 
-    override function executeSynchronous(): Void
+    override function subclassExecuteSynchronous(): Void
     {
         executeFuncAndExit();
     }
 
     private function executeFuncAndExit(): Void
     {
-        switch(result)
+        if (func != null)
         {
-            case TaskResultCancelled,
-                 TaskResultFailed(_, _),
-                 TaskResultSuccessful:
-                return;
-            case TaskResultPending:
-
-                func();
-
-                if(callFinish)
-                {
-                    finish();
-                }
-
-                return;
+            func();
         }
+
+        if(callFinish)
+        {
+            finish();
+        }
+
+        return;
     }
 
     override function set_result(newResult: TaskResult): TaskResult
     {
-        switch ([result, newResult])
-        {
-            case [TaskResultPending, _]:
-                result = newResult;
-            default:
-                throw "Incorrect state on task, task result should only go from pending to any other state";
-        }
+        super.set_result(newResult);
 
         switch(result)
         {
-            case TaskResultPending:
+            case TaskResultPending,
+                 TaskResultNotStarted:
             default:
                 func = null;
         }
